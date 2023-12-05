@@ -18,7 +18,9 @@ const DB = {
 }
 
 app.get('/:model', async (req, res) => {
-  const [data] = await DB[req.params.model].model().find();
+  const entity = DB[req.params.model];
+  if (!entity) return;
+  const [data] = await entity.model().find();
   res.json(data);
 });
 

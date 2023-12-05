@@ -1,7 +1,18 @@
 version: '3'
 
 services:
+  client:
+    container_name: docker-playground_client
+    build: ./client
+    command: npm run start
+    restart: unless-stopped
+    ports:
+      - "4200:4200"
+    stdin_open: true
+    tty: true
+
   api:
+    container_name: docker-playground_api
     build: ./api
     command: npm run start
     restart: unless-stopped
@@ -14,9 +25,32 @@ services:
       - api_db
 
   api_db:
+    container_name: docker-playground_api_db
     image: mongo:latest
     volumes:
       - mongodb_api:/data/db
 
+  auth:
+    container_name: docker-playground_auth
+    build: ./auth
+    command: npm run start
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - MONGODB_URL=mongodb://auth_db:27017/auth
+    depends_on:
+      - auth_db
+
+
+  auth_db:
+    container_name: docker-playground_auth_db
+    image: mongo:latest
+    volumes:
+      - mongodb_auth:/data/db
+
+
 volumes:
   mongodb_api:
+  mongodb_auth:
